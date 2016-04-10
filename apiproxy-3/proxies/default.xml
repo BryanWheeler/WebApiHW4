@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProxyEndpoint name="default">
+    <Description/>
+    <FaultRules/>
+    <PreFlow name="PreFlow">
+        <Request/>
+        <Response/>
+    </PreFlow>
+    <PostFlow name="PostFlow">
+        <Request>
+            curl -X POST "https://api.usergrid.com/chikarabw/sandbox/movies" -d '{"title":"Braveheart", "Released":"1995", "Known Actors:"Mel Gibson, Sohpie Marceau, Angus MacFadyen"}'
+        </Request>
+        <Response/>
+    </PostFlow>
+    <Flows>
+        <Flow name="GetMovies">
+            <Description>get movies from collection</Description>
+            <Request>
+                var properties = { 
+	                method:'GET', 
+	                type:'movies',
+	                title:'Top Gun' 
+                }; 
+
+                client.getEntity(properties, function (error, result) { 
+            	    if (error) { 
+	                //error 
+	                } else { 
+	                //success 
+	                } 
+                    });
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/movies") and (request.verb = "GET")</Condition>
+        </Flow>
+        <Flow name="CreateMovies">
+            <Description>put movies into collection</Description>
+            <Request/>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/users") and (request.verb = "PUT")</Condition>
+        </Flow>
+        <Flow name="GetListofMovies">
+            <Description>get a list of movies with certain criteria</Description>
+            <Request>
+                curl -X GET "https://api.usergrid.com/chikarabw/sandbox/movies?ql=title="Top Gun" OR Released="2012"
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/movies") and (request.verb = "GET")</Condition>
+        </Flow>
+        <Flow name="DeleteMovie">
+            <Description>delete a movie from the collection</Description>
+            <Response>
+                curl -X DELETE "https://api.usergrid.com/chikarabw/sandbox/movies/Gone Girl"
+            </Response>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/movies") and (request.verb = "DELETE")</Condition>
+        </Flow>
+    </Flows>
+    <HTTPProxyConnection>
+        <BasePath>/movielibrary</BasePath>
+        <Properties/>
+        <VirtualHost>default</VirtualHost>
+        <VirtualHost>secure</VirtualHost>
+    </HTTPProxyConnection>
+    <RouteRule name="default">
+        <TargetEndpoint>default</TargetEndpoint>
+    </RouteRule>
+    <RouteRule name="GetMovies">
+        <Condition>(proxy.pathsuffix MatchesPath "/users") and (request.verb = "GET")</Condition>
+        <URL>https://api.usergrid.com/chikarabw/sandbox/movies</URL>
+    </RouteRule>
+    <RouteRule name="CreateMovies">
+        <Condition>(proxy.pathsuffix MatchesPath "/users") and (request.verb = "PUT")</Condition>
+        <URL>http://api.usergrid.com/chikarabw/sandbox/movies</URL>
+    </RouteRule>
+    <RouteRule name="GetListofMovies">
+        <Condition>(proxy.pathsuffix MatchesPath "/users") and (request.verb = "GET")</Condition>
+        <URL>https://api.usergrid.com/chikarabw/sandbox/movies</URL>
+    </RouteRule>
+    <RouteRule name="DeleteMovie">
+        <Condition>(proxy.pathsuffix MatchesPath "/users") and (request.verb = "DELETE")</Condition>
+        <URL>https://api.usergrid.com/chikarabw/sandbox/movies</URL>
+    </RouteRule>
+</ProxyEndpoint>
